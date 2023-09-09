@@ -12,9 +12,9 @@ namespace Server
     {
         public const int MaxRadioChannels = 9;
         public const string UNIQUE_SERVER_ID = "";
-        public const int CHANNEL_ID = 0;
+        public const int CHANNEL_ID = 1;
         public const string CHANNEL_PASSWORD = "";
-        public const int DEFAULT_CHANNEL_ID = 1;
+        public const int DEFAULT_CHANNEL_ID = 0;
     }
 
     internal class Voice : IScript
@@ -68,14 +68,7 @@ namespace Server
         {
             player.VoiceSettings.VoiceFirstConnect = true;
 
-            player.Emit("client:yaca:init", new
-            {
-                suid = Settings.UNIQUE_SERVER_ID,
-                chid = Settings.CHANNEL_ID,
-                deChid = Settings.DEFAULT_CHANNEL_ID,
-                channelPassword = Settings.CHANNEL_PASSWORD,
-                ingameName = player.VoiceSettings.IngameName
-            });
+            player.Emit("client:yaca:init", Settings.UNIQUE_SERVER_ID, Settings.CHANNEL_ID, Settings.DEFAULT_CHANNEL_ID, Settings.CHANNEL_PASSWORD, player.VoiceSettings.IngameName);
         }
 
         public static void ConnectToVoice(YaCAPlayer player)
@@ -236,8 +229,14 @@ namespace Server
         #endregion
 
         #region Core events
+        [ScriptEvent(ScriptEventType.PlayerConnect)]
+        public void PlayerConnect(YaCAPlayer player, string reason)
+        {
+            ConnectToVoice(player);
+        }
+
         [ScriptEvent(ScriptEventType.PlayerDisconnect)]
-        public void HandlePlayerDisconnect(YaCAPlayer player)
+        public void HandlePlayerDisconnect(YaCAPlayer player, string reason)
         {
             int playerId = player.Id;
 
@@ -258,7 +257,7 @@ namespace Server
         }
 
         [ScriptEvent(ScriptEventType.PlayerLeaveVehicle)]
-        public void HandlePlayerLeaveVehicle(YaCAPlayer player, IVehicle vehicle, byte seat)
+        public void HandlePlayerLeaveVehicle(IVehicle vehicle, YaCAPlayer player, byte seat)
         {
             ChangeMegaphoneState(player, false, true);
         }
