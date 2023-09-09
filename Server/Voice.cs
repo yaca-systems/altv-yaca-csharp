@@ -143,7 +143,6 @@ namespace Server
             player.RadioSettings.HasLong = true;
         }
 
-        /* TODO
         public static void LeaveRadioFrequency(YaCAPlayer player, int channel, string frequency)
         {
             if (!player.Exists)
@@ -156,22 +155,24 @@ namespace Server
                 frequency = player.RadioSettings.Frequencies[channel];
             }
 
-            if (!RadioFrequencyMap.ContainsKey(frequency))
+            int parsedFrequency = int.Parse(frequency);
+
+            if (!RadioFrequencyMap.ContainsKey(parsedFrequency))
             {
                 return;
             }
 
-            RadioFrequencyMap[frequency].Remove(player.Id);
+            RadioFrequencyMap[parsedFrequency].Remove(player.Id);
 
             player.RadioSettings.Frequencies[channel] = "0";
 
             player.Emit("client:yaca:setRadioFreq", channel, 0);
 
-            if (RadioFrequencyMap[frequency].Count == 0)
+            if (RadioFrequencyMap[parsedFrequency] == null)
             {
-                RadioFrequencyMap.Remove(frequency);
+                RadioFrequencyMap.Remove(parsedFrequency);
             }
-        }*/
+        }
 
         public static void CallPlayer(YaCAPlayer player, YaCAPlayer target, bool state)
         {
@@ -456,7 +457,6 @@ namespace Server
             player.SetStreamSyncedMetaData("yaca:radioEnabled", state);
         }
 
-        /* TODO
         [ClientEvent("server:yaca:changeRadioFrequency")]
         public void ChangeRadioFrequency(YaCAPlayer player, int channel, string frequency)
         {
@@ -482,12 +482,7 @@ namespace Server
                 return;
             }
 
-            if (!RadioFrequencyMap.ContainsKey(frequency))
-            {
-                RadioFrequencyMap.Add(frequency, new Dictionary<int, string>());
-            }
-
-            RadioFrequencyMap[frequency].Add(player.Id, new Dictionary<int, string>());
+            int parsedFrequency = int.Parse(frequency);
 
             player.RadioSettings.Frequencies[channel] = frequency;
 
@@ -504,12 +499,14 @@ namespace Server
 
             string radioFrequency = player.RadioSettings.Frequencies[channel];
 
-            if (!RadioFrequencyMap.ContainsKey(radioFrequency))
+            int parsedRadioFrequency = int.Parse(radioFrequency);
+
+            if (!RadioFrequencyMap.ContainsKey(parsedRadioFrequency))
             {
                 return;
             }
 
-            if (RadioFrequencyMap[radioFrequency].TryGetValue(player.Id, out var foundPlayer))
+            if (RadioFrequencyMap[parsedRadioFrequency].TryGetValue(player.Id, out var foundPlayer))
             {
                 foundPlayer.Muted = !foundPlayer.Muted;
 
@@ -531,6 +528,7 @@ namespace Server
             }
 
             string radioFrequency = player.RadioSettings.Frequencies[player.RadioSettings.CurrentChannel];
+            int parsedRadioFrequency = int.Parse(radioFrequency);
 
             if (string.IsNullOrEmpty(radioFrequency))
             {
@@ -539,7 +537,7 @@ namespace Server
 
             int playerID = player.Id;
 
-            if (!RadioFrequencyMap.TryGetValue(radioFrequency, out var getPlayers)) return;
+            if (!RadioFrequencyMap.TryGetValue(parsedRadioFrequency, out var getPlayers)) return;
 
             List<YaCAPlayer> targets = new List<YaCAPlayer>();
             Dictionary<int, Dictionary<string, bool>> radioInfos = new Dictionary<int, Dictionary<string, bool>>();
@@ -561,7 +559,7 @@ namespace Server
 
                 if (key == playerID) continue;
 
-                YaCAPlayer target = Alt.GetAllPlayers().Where(player.Id);
+                YaCAPlayer target = Alt.GetAllPlayers().Where(target.Id);
 
                 if (target == null || !target.Exists || !target.RadioSettings.Activated) continue;
 
@@ -586,9 +584,9 @@ namespace Server
                     radioInfoDictionary.Add(kvp.Key, kvp.Value);
                 }
 
-                Alt.EmitClients(targets, "client:yaca:radioTalking", player.Id, radioFrequency, state, radioInfoDictionary);
+                targets.Emit("client:yaca:radioTalking", player.Id, radioFrequency, state, radioInfoDictionary);
             }
-        }*/
+        }
 
         [ClientEvent("server:yaca:changeActiveRadioChannel")]
         public void RadioActiveChannelChange(YaCAPlayer player, int channel)
