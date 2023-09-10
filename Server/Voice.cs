@@ -330,16 +330,16 @@ namespace Server
         }
 
         [ClientEvent("server:yaca:addPlayer")]
-        public static void AddNewPlayer(YaCAPlayer player, int cid)
+        public static void AddNewPlayer(YaCAPlayer player, int clientId)
         {
-            if (!player.Exists || cid == 0)
+            if (!player.Exists || clientId == 0)
             {
                 return;
             }
 
             player.VoicePlugin = new VoicePlugin
             {
-                ClientId = cid,
+                ClientId = clientId,
                 ForceMuted = player.VoiceSettings.Muted,
                 Range = player.VoiceSettings.VoiceRange,
                 PlayerId = player.Id
