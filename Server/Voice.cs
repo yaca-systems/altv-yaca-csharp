@@ -134,7 +134,7 @@ namespace Server
 
             if (player.VoicePlugin != null)
             {
-                player.VoicePlugin.Muted = !alive;
+                player.VoicePlugin.ForceMuted = !alive;
             }
         }
 
@@ -339,8 +339,8 @@ namespace Server
 
             player.VoicePlugin = new VoicePlugin
             {
-                CId = cid,
-                Muted = player.VoiceSettings.Muted,
+                ClientId = cid,
+                ForceMuted = player.VoiceSettings.Muted,
                 Range = player.VoiceSettings.VoiceRange,
                 PlayerId = player.Id
             };

@@ -15,8 +15,8 @@ namespace Server.Factories
 
     public class VoicePlugin
     {
-        public int CId { get; set; }
-        public bool Muted { get; set; }
+        public int ClientId { get; set; }
+        public bool ForceMuted { get; set; }
         public int Range { get; set; }
         public int PlayerId { get; set; }
     }
