@@ -90,7 +90,7 @@ namespace Server
                 VoiceRange = 3,
                 VoiceFirstConnect = false,
                 MaxVoceRangeInMeter = 15,
-                Muted = false,
+                ForceMuted = false,
                 IngameName = name
             };
 
@@ -128,7 +128,7 @@ namespace Server
                 return;
             }
 
-            player.VoiceSettings.Muted = !alive;
+            player.VoiceSettings.ForceMuted = !alive;
 
             Alt.EmitAllClients("client:yaca:muteTarget", player.Id, !alive);
 
@@ -340,7 +340,7 @@ namespace Server
             player.VoicePlugin = new VoicePlugin
             {
                 ClientId = clientId,
-                ForceMuted = player.VoiceSettings.Muted,
+                ForceMuted = player.VoiceSettings.ForceMuted,
                 Range = player.VoiceSettings.VoiceRange,
                 PlayerId = player.Id
             };
@@ -506,8 +506,8 @@ namespace Server
 
             if (RadioFrequencyMap.TryGetValue(parsedRadioFrequency, out var foundPlayer))
             {
-                foundPlayer.VoiceSettings.Muted = !foundPlayer.VoiceSettings.Muted;
-                player.Emit("client:yaca:setRadioMuteState", channel, foundPlayer.VoiceSettings.Muted);
+                foundPlayer.VoiceSettings.ForceMuted = !foundPlayer.VoiceSettings.ForceMuted;
+                player.Emit("client:yaca:setRadioMuteState", channel, foundPlayer.VoiceSettings.ForceMuted);
             }
         }
 
@@ -544,7 +544,7 @@ namespace Server
                 int key = kvp.Key;
                 var values = kvp.Value;
 
-                if (values.Muted)
+                if (values.ForceMuted)
                 {
                     if (key == playerID)
                     {

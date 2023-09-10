@@ -9,7 +9,7 @@ namespace Server.Factories
         public int VoiceRange { get; set; }
         public bool VoiceFirstConnect { get; set; }
         public int MaxVoceRangeInMeter { get; set; }
-        public bool Muted { get; set; }
+        public bool ForceMuted { get; set; }
         public string IngameName { get; set; }
     }
 
