@@ -492,25 +492,22 @@ namespace Server
         [ClientEvent("server:yaca:muteRadioChannel")]
         public void RadioChannelMute(YaCAPlayer player, int channel)
         {
-            if (!player.Exists)
+            if (player == null || player.RadioSettings == null || player.RadioSettings.Frequencies == null)
             {
                 return;
             }
 
-            string radioFrequency = player.RadioSettings.Frequencies[channel];
+            string radioFrequency = channel < player.RadioSettings.Frequencies.Count ? player.RadioSettings.Frequencies[channel] : null;
 
-            int parsedRadioFrequency = int.Parse(radioFrequency);
-
-            if (!RadioFrequencyMap.ContainsKey(parsedRadioFrequency))
+            if (string.IsNullOrEmpty(radioFrequency) || !int.TryParse(radioFrequency, out int parsedRadioFrequency))
             {
                 return;
             }
 
-            if (RadioFrequencyMap[parsedRadioFrequency].TryGetValue(player.Id, out var foundPlayer))
+            if (RadioFrequencyMap.TryGetValue(parsedRadioFrequency, out var foundPlayer))
             {
-                foundPlayer.Muted = !foundPlayer.Muted;
-
-                player.Emit("client:yaca:setRadioMuteState", channel, foundPlayer.Muted);
+                foundPlayer.VoiceSettings.Muted = !foundPlayer.VoiceSettings.Muted;
+                player.Emit("client:yaca:setRadioMuteState", channel, foundPlayer.VoiceSettings.Muted);
             }
         }
 
@@ -539,7 +536,7 @@ namespace Server
 
             if (!RadioFrequencyMap.TryGetValue(parsedRadioFrequency, out var getPlayers)) return;
 
-            List<YaCAPlayer> targets = new List<YaCAPlayer>();
+            List<IPlayer[]> targets = new List<IPlayer[]>();
             Dictionary<int, Dictionary<string, bool>> radioInfos = new Dictionary<int, Dictionary<string, bool>>();
 
             foreach (var kvp in getPlayers)
@@ -559,7 +556,7 @@ namespace Server
 
                 if (key == playerID) continue;
 
-                YaCAPlayer target = Alt.GetAllPlayers().Where(target.Id);
+                YaCAPlayer target = Alt.GetAllPlayers().FirstOrDefault(player => player.Id == player.Id);
 
                 if (target == null || !target.Exists || !target.RadioSettings.Activated) continue;
 
@@ -584,7 +581,7 @@ namespace Server
                     radioInfoDictionary.Add(kvp.Key, kvp.Value);
                 }
 
-                targets.Emit("client:yaca:radioTalking", player.Id, radioFrequency, state, radioInfoDictionary);
+                Alt.EmitClients(targets, "client:yaca:radioTalking", player.Id, radioFrequency, state, radioInfoDictionary);
             }
         }
 

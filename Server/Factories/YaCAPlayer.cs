@@ -31,7 +31,7 @@ namespace Server.Factories
     #endregion
 
     #region Factory handling
-    internal class YaCAPlayer : Player
+    public class YaCAPlayer : Player
     {
         public VoiceSettings VoiceSettings { get; set; }
         public VoicePlugin VoicePlugin { get; set; }
