@@ -504,7 +504,7 @@ namespace Server
                 return;
             }
 
-            if (RadioFrequencyMap.TryGetValue(parsedRadioFrequency, out var foundPlayer))
+            if (RadioFrequencyMap.TryGetValue(parsedRadioFrequency, out YaCAPlayer foundPlayer))
             {
                 foundPlayer.VoiceSettings.ForceMuted = !foundPlayer.VoiceSettings.ForceMuted;
                 player.Emit("client:yaca:setRadioMuteState", channel, foundPlayer.VoiceSettings.ForceMuted);
@@ -541,7 +541,7 @@ namespace Server
 
             foreach (var kvp in getPlayers)
             {
-                int key = kvp.Key;
+                ushort key = kvp.Key;
                 var values = kvp.Value;
 
                 if (values.ForceMuted)
@@ -556,7 +556,7 @@ namespace Server
 
                 if (key == playerID) continue;
 
-                YaCAPlayer target = Alt.GetAllPlayers().FirstOrDefault(player => player.Id == player.Id);
+                YaCAPlayer target = Alt.GetEntityById(key);
 
                 if (target == null || !target.Exists || !target.RadioSettings.Activated) continue;
 
